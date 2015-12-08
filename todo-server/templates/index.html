@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+  <h1>Hello Servant!</h1>
+
+  <table id="js-todo-list" border=1>
+    <tr>
+      <th> Todo </th>
+      <th> Done </th>
+    </tr>
+  </table>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="/static/todo_crud.js"></script>
+  <script>
+getalltodo(function(todoList){
+  var table = $("table#js-todo-list");
+  todoList.forEach(function(todo){
+    var title = $("<td />").text(todo.title);
+    var checkbox = $("<input />").attr("type", "checkbox");
+    if (todo.done) {
+      checkbox.attr("checked", "checked");
+    }
+    var done  = $("<td />").append(checkbox);
+    var tr = $("<tr />").append(title).append(done);
+    table.append(tr);
+  });
+});
+  </script>
+</body>
+</html>
