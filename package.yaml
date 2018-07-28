@@ -1,0 +1,64 @@
+name:                ac2015-servant-example
+version:             0.1.0.0
+github:              "https://github.com/lotz84/ac2015-servant-example"
+license:             BSD3
+author:              "Tatsuya Hirose"
+copyright:           "2018 Tatsuya Hirose"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/lotz84/ac2015-servant-example#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: todo
+  dependencies:
+    - aeson
+    - http-api-data
+    - servant
+    - text
+
+executables:
+  todo-client:
+    main:                Main.hs
+    source-dirs:         todo-client
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - http-client
+    - servant
+    - servant-client
+    - ac2015-servant-example
+  todo-jquery:
+    main:                Main.hs
+    source-dirs:         todo-jquery
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - servant-js
+    - ac2015-servant-example
+  todo-server:
+    main:                Main.hs
+    source-dirs:         todo-server
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aeson
+    - bytestring
+    - containers
+    - http-media
+    - servant-mock
+    - servant-server
+    - stm
+    - warp
+    - QuickCheck
+    - ac2015-servant-example

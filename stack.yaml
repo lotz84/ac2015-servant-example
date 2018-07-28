@@ -1,8 +1,4 @@
-resolver: lts-3.17
+resolver: lts-12.2
+
 packages:
-- '.'
-extra-deps:
-- servant-ede-0.5.1
-- servant-mock-0.4.4.5
-flags: {}
-extra-package-dbs: []
+- .

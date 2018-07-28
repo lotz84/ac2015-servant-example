@@ -1,21 +1,20 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
 import Control.Monad (void)
-import Control.Monad.Trans.Either
 import Control.Monad.IO.Class
+import Network.HTTP.Client (newManager, defaultManagerSettings)
 import Servant.API
 import Servant.Client
+
 import Todo as Todo
 
-getTodoAll   :: EitherT ServantError IO [Todo]
-postTodo     :: Todo -> EitherT ServantError IO Todo
-putTodoId    :: Int -> Todo -> EitherT ServantError IO ()
-deleteTodoId :: Int -> EitherT ServantError IO ()
+getTodoAll   :: ClientM [Todo]
+postTodo     :: Todo -> ClientM Todo
+putTodoId    :: Int -> Todo -> ClientM ()
+deleteTodoId :: Int -> ClientM ()
 
-getTodoAll :<|> postTodo :<|> putTodoId :<|> deleteTodoId =
-  client Todo.crud $ BaseUrl Http "localhost" 8080
+getTodoAll :<|> postTodo :<|> putTodoId :<|> deleteTodoId = client Todo.crud
 
 todoList :: [Todo]
 todoList =
@@ -25,10 +24,12 @@ todoList =
     ]
 
 main :: IO ()
-main = void . runEitherT $ do
-  mapM_ postTodo todoList
-  putTodoId 1 $ (todoList !! 0) {done = True}
-  deleteTodoId 3
-  list <- getTodoAll
-  liftIO . mapM_ putStrLn $ map title list
-
+main = do
+  manager <- newManager defaultManagerSettings
+  let env = mkClientEnv manager $ BaseUrl Http "localhost" 8080 ""
+  void . flip runClientM env $ do
+    mapM_ postTodo todoList
+    putTodoId 1 $ (todoList !! 0) {done = True}
+    deleteTodoId 3
+    list <- getTodoAll
+    liftIO . mapM_ putStrLn $ map title list

@@ -1,36 +1,47 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
 import Control.Concurrent.STM
 import Control.Monad.IO.Class
 import Data.Aeson
+import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy as B
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import GHC.Generics
+import Network.HTTP.Media ((//), (/:))
 import Servant
-import Servant.EDE
 import qualified Network.Wai.Handler.Warp as Warp
 
 import Todo as Todo
 
-type API = Get '[HTML "index.html"] Object
+type API = Get '[HTML] ByteString
          :<|> "static" :> Raw
          :<|> Todo.CRUD
 
--- | 唯一のボイラープレート
+data HTML
+
+instance Accept HTML where
+  contentType _ = "text" // "html" /: ("charset", "utf-8")
+
+instance MimeRender HTML ByteString where
+  mimeRender _ bs = bs
+
 api :: Proxy API
 api = Proxy
 
-server :: TVar (Int, IntMap Todo) -> Server API
-server db = index
-       :<|> serveDirectory "todo-server/static"
+server :: ByteString -> TVar (Int, IntMap Todo) -> Server API
+server indexHtml db = index
+       :<|> serveDirectoryFileServer "todo-server/static"
        :<|> getTodoAll
        :<|> postTodo
        :<|> putTodoId
        :<|> deleteTodoId
   where
-    index              = pure mempty
+    index              = pure indexHtml
     getTodoAll         = liftIO $ IntMap.elems . snd <$> atomically (readTVar db)
     postTodo todo      = liftIO . atomically $ do
                            (maxId, m) <- readTVar db
@@ -46,6 +57,6 @@ server db = index
 main :: IO ()
 main = do
   db <- atomically $ newTVar (0, IntMap.empty)
-  loadTemplates api "todo-server/templates"
+  indexHtml <- B.readFile "todo-server/templates/index.html"
   putStrLn "Listening on port 8080"
-  Warp.run 8080 $ serve api (server db)
+  Warp.run 8080 $ serve api (server indexHtml db)

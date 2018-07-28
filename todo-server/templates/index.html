@@ -14,7 +14,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="/static/todo_crud.js"></script>
   <script>
-getalltodo(function(todoList){
+getTodoAll(function(todoList){
   var table = $("table#js-todo-list");
   todoList.forEach(function(todo){
     var title = $("<td />").text(todo.title);

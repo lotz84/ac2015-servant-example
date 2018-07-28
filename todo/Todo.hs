@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -11,26 +12,22 @@ module Todo (
 
 import Data.Aeson
 import Data.Proxy
+import qualified Data.Text as Text
 import GHC.Generics
 import Servant.API
-import qualified Data.Text as Text
+import Web.FormUrlEncoded (FromForm(..), parseUnique)
 
--- | Todoに関する情報
 data Todo = Todo
   { todoId :: Int
   , title  :: String
   , done   :: Bool
-  } deriving Generic
+  } deriving (Generic, FromJSON, ToJSON)
 
-instance FromJSON Todo
-instance ToJSON Todo
-
-instance FromFormUrlEncoded Todo where
-  fromFormUrlEncoded inputs = Todo <$> lkp "todoId" <*> lkp "title" <*> lkp "done"
-    where
-      lkp l = case lookup l inputs of
-                Nothing -> Left $ "label " ++ Text.unpack l ++ " not found"
-                Just v  -> Right $ read (Text.unpack v)
+instance FromForm Todo where
+  fromForm form = Todo
+              <$> parseUnique "todoId" form
+              <*> parseUnique "title" form
+              <*> parseUnique "done" form
 
 type CRUD =    "todo" :> "all" :> Get '[JSON] [Todo]
           :<|> "todo" :> ReqBody '[JSON, FormUrlEncoded] Todo :> Post '[JSON] Todo
@@ -39,3 +36,4 @@ type CRUD =    "todo" :> "all" :> Get '[JSON] [Todo]
 
 crud :: Proxy CRUD
 crud = Proxy
+

@@ -1,5 +1,5 @@
 
-function getalltodo(onSuccess, onError)
+var getTodoAll = function(onSuccess, onError)
 {
   $.ajax(
     { url: '/todo/all'
@@ -9,7 +9,7 @@ function getalltodo(onSuccess, onError)
     });
 }
 
-function posttodo(body, onSuccess, onError)
+var postTodo = function(body, onSuccess, onError)
 {
   $.ajax(
     { url: '/todo'
@@ -21,7 +21,7 @@ function posttodo(body, onSuccess, onError)
     });
 }
 
-function puttodo(id, body, onSuccess, onError)
+var putTodoById = function(id, body, onSuccess, onError)
 {
   $.ajax(
     { url: '/todo/' + encodeURIComponent(id) + ''
@@ -33,7 +33,7 @@ function puttodo(id, body, onSuccess, onError)
     });
 }
 
-function deletetodo(id, onSuccess, onError)
+var deleteTodoById = function(id, onSuccess, onError)
 {
   $.ajax(
     { url: '/todo/' + encodeURIComponent(id) + ''
