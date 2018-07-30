@@ -22,6 +22,19 @@ library:
     - text
 
 executables:
+  simple:
+    main:                Main.hs
+    source-dirs:         simple
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aeson
+    - servant-mock
+    - servant-server
+    - warp
+    - QuickCheck
   todo-client:
     main:                Main.hs
     source-dirs:         todo-client
@@ -60,5 +73,4 @@ executables:
     - servant-server
     - stm
     - warp
-    - QuickCheck
     - ac2015-servant-example
